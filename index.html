@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="description" content="Unit 4 CS4406 Computer Graphics" />
+  <meta charset="utf-8" />
+  <title> Unit 4 CS4406 Computer Graphics</title>
+  <style>
+    /* Defines the CSS style for the container element, setting the background color to black and making it full-screen. */
+
+    #container {
+      background: #000000;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Create a container for the Three.js canvas -->
+  <div id="container"></div>
+  <!-- Import Three.js and its OrbitControls library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    // Get the HTML container element with ID "container"
+    var container = document.getElementById("container");
+    // Set the dimensions of the rendering area
+    var WIDTH = 600,
+      HEIGHT = 600;
+    // Set the field of view, aspect ratio, and clipping planes for the camera
+    var VIEW_ANGLE = 45,
+      ASPECT = WIDTH / HEIGHT,
+      NEAR = 1,
+      FAR = 1000;
+    // Create a WebGL renderer
+    var renderer = new THREE.WebGLRenderer();
+    // Create a new scene
+    var scene = new THREE.Scene();
+    // Create a clock object to measure time
+    var clock = new THREE.Clock();
+    // Create a camera with the previously defined parameters
+    var camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+
+    // Set the position of the camera in the scene
+    camera.position.set(0, 0, 80);
+
+    // Add the camera to the scene
+    scene.add(camera);
+
+    // Create a camera controller for the orbiting movement
+    var cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    // Set the dimensions of the rendering output
+    renderer.setSize(WIDTH, HEIGHT);
+
+    // Add the renderer to the HTML container element
+    container.appendChild(renderer.domElement);
+
+    var loader = new THREE.TextureLoader(); // Define loader for textures
+
+    // Define four textures for the 3D object
+    var textures = [
+      loader.load(
+        "https://cdn.pixabay.com/photo/2017/08/10/16/53/abstract-2624807_960_720.jpg"
+      ),
+      loader.load(
+        "https://cdn.pixabay.com/photo/2018/10/16/19/18/swirl-3752278_960_720.jpg"
+
+      ),
+      loader.load(
+        "https://cdn.pixabay.com/photo/2016/11/29/05/45/astronomy-1867616_960_720.jpg"
+      ),
+      loader.load(
+
+        "https://cdn.pixabay.com/photo/2022/06/23/00/26/hd-wallpaper-7278936_960_720.jpg"
+      ),
+    ];
+
+    // Define the material for the 3D object
+    var material = new THREE.MeshStandardMaterial({
+      map: textures[0],
+      roughness: 0.5,
+      metalness: 0.5,
+      side: THREE.DoubleSide,
+    });
+
+    // Define the geometry for the 3D object
+    var geometry = new THREE.BoxGeometry(30, 30, 30);
+
+    // Define the mesh for the 3D object
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(0, 0, 0);
+    mesh.castShadow = true; // enable casting shadows
+    mesh.receiveShadow = true; // enable receiving shadows
+    scene.add(mesh);
+
+
+    // Define the ambient light for the scene
+    var ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(ambientLight);
+
+    // Define the directional light for the scene
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(-50, 50, 50);
+    directionalLight.castShadow = true; //
+    directionalLight.shadow.mapSize.width = 2048; // Set shadow map size
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.near = 0.5; // Set shadow camera parameters
+    directionalLight.shadow.camera.far = 500;
+    scene.add(directionalLight);
+
+    // Sets the light source appropriately
+    mesh.material.needsUpdate = true;
+    mesh.material.side = THREE.FrontSide;
+    mesh.material.map = textures[0];
+    mesh.material.needsUpdate = true;
+
+
+    // Add a new point light to the scene and position it in the upper left corner
+    var cornerLight = new THREE.PointLight(0xFFFAAA, 1, 100);
+    cornerLight.position.set(-10, 9, 1);
+    scene.add(cornerLight);
+    // Limits the rotation of the object to show one texture at a time
+    var rotationSpeed = 1;
+    var currentRotation = 1;
+
+    // Adds controls to toggle between textures
+
+    var textureIndex = 0;
+    var textureButton = document.createElement("button");
+    textureButton.innerHTML = "Change Texture";
+    textureButton.onclick = function () {
+      textureIndex = (textureIndex + 1) % textures.length;
+      mesh.material.map = textures[textureIndex];
+      mesh.material.needsUpdate = true;
+    };
+    document.body.appendChild(textureButton);
+
+    // Added CSS styles to make the button bigger and colorful to grab kids' attention
+    textureButton.style.fontSize = "24px";
+    textureButton.style.padding = "12px 24px";
+    textureButton.style.background = "linear-gradient(to bottom, #ff0066, #ff6600)";
+    textureButton.style.color = "#ffffff";
+
+
+    // Render the scene this makes the cube rotate clockwise
+    function render() {
+      var delta = clock.getDelta();
+      currentRotation -= rotationSpeed * delta;
+      mesh.rotation.y = currentRotation;
+      renderer.render(scene, camera);
+      requestAnimationFrame(render);
+    }
+    render();
+
+  </script>
+</body>
+
+</html>
